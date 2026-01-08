@@ -1,6 +1,7 @@
 import itertools
 import operator
 import os
+import string
 from pathlib import Path
 
 from . import data
@@ -128,8 +129,24 @@ def create_tag(name, oid):
 
 
 def get_oid(name):
-    return data.get_ref(name) or name
+    # Name is ref
+    refs_to_try = [
+        f"{name}",
+        f"refs/{name}",
+        f"refs/tags/{name}",
+        f"refs/heads/{name}",
+    ]
+    for ref in refs_to_try:
+        oid = data.get_ref(ref)
+        if oid:
+            return oid
 
+    # Name is SHA1
+    if len(name) == 40 and all(c in string.hexdigits for c in name):
+        return name
 
+    return None
+    
+    
 def is_ignored(path: Path):
     return ".pika" in path.parts
