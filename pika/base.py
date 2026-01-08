@@ -124,8 +124,7 @@ def checkout(oid):
 
 
 def create_tag(name, oid):
-    # TODO Actually create the tag
-    pass
+    data.update_ref(f"refs/tags/{name}", oid)
 
 
 def is_ignored(path: Path):
