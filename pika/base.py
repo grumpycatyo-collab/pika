@@ -2,6 +2,12 @@ import os
 from pathlib import Path
 from . import data
 
+import itertools
+import operator
+import os
+
+from collections import namedtuple
+
 def write_tree(directory='.'):
     entries = []
     with os.scandir(directory) as it:
@@ -87,6 +93,29 @@ def commit (message):
     data.set_HEAD(oid)
 
     return oid
+
+
+
+Commit = namedtuple ('Commit', ['tree', 'parent', 'message'])
+
+
+def get_commit (oid):
+    parent = None
+
+    commit = data.get_object (oid, 'commit').decode ()
+    lines = iter (commit.splitlines ())
+    for line in itertools.takewhile (operator.truth, lines):
+        key, value = line.split (' ', 1)
+        if key == 'tree':
+            tree = value
+        elif key == 'parent':
+            parent = value
+        else:
+            assert False, f'Unknown field {key}'
+
+    message = '\n'.join (lines)
+    return Commit (tree=tree, parent=parent, message=message)
+
 
 def is_ignored(path: Path):
     return '.pika' in path.parts

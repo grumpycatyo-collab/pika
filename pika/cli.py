@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 from . import data
 from . import base
+import textwrap
 
 def main():
     args = parse_args()
@@ -37,6 +38,9 @@ def parse_args ():
     commit_parser.set_defaults(func=commit)
     commit_parser.add_argument('-m', '--message', required=True)
 
+    log_parser = commands.add_parser ('log')
+    log_parser.set_defaults (func=log)
+
     return parser.parse_args()
 
 
@@ -60,3 +64,14 @@ def read_tree(args):
 
 def commit(args):
     print(base.commit(args.message))
+
+def log (args):
+    oid = data.get_HEAD ()
+    while oid:
+        commit = base.get_commit (oid)
+
+        print (f'commit {oid}\n')
+        print (textwrap.indent (commit.message, '    '))
+        print ('')
+
+        oid = commit.parent
