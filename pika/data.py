@@ -4,7 +4,6 @@ from pathlib import Path
 
 GIT_DIR = Path(".pika")
 OBJECTS_DIR = GIT_DIR / "objects"
-HEAD_DIR = GIT_DIR / "HEAD"
 
 
 def init():
@@ -12,14 +11,14 @@ def init():
     os.makedirs(OBJECTS_DIR)
 
 
-def set_HEAD(oid):
-    with open(HEAD_DIR, "w") as f:
+def update_ref(ref, oid):
+    with open(GIT_DIR / ref, "w") as f:
         f.write(oid)
 
 
-def get_HEAD():
-    if os.path.isfile(HEAD_DIR):
-        with open(HEAD_DIR) as f:
+def get_ref(ref):
+    if os.path.isfile(GIT_DIR / ref):
+        with open(GIT_DIR / ref) as f:
             return f.read().strip()
 
 

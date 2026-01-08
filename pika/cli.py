@@ -1,7 +1,6 @@
 import sys
 import textwrap
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -50,9 +49,9 @@ def commit(message: str = typer.Option(..., "--message", "-m")):
 
 
 @app.command()
-def log(oid: Optional[str] = None):
+def log(oid: str | None = None):
     """Show the commit log starting from the given commit or HEAD."""
-    oid = oid or data.get_HEAD()
+    oid = oid or data.get_ref("HEAD")
     while oid:
         commit = base.get_commit(oid)
 
@@ -67,6 +66,13 @@ def log(oid: Optional[str] = None):
 def checkout(oid: str):
     """Checkout a commit and update the working directory."""
     base.checkout(oid)
+
+
+@app.command()
+def tag(name: str, oid: str | None = None):
+    """Tag a specific commit."""
+    oid = oid or data.get_ref("HEAD")
+    base.create_tag(name, oid)
 
 
 def main():
