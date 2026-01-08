@@ -58,12 +58,12 @@ def _empty_current_directory():
     for root, dirnames, filenames in os.walk ('.', topdown=False):
         for filename in filenames:
             path = os.path.relpath (f'{root}/{filename}')
-            if is_ignored (path) or not os.path.isfile (path):
+            if is_ignored (Path(path)) or not os.path.isfile (path):
                 continue
             os.remove (path)
         for dirname in dirnames:
             path = os.path.relpath (f'{root}/{dirname}')
-            if is_ignored (path):
+            if is_ignored (Path(path)):
                 continue
             try:
                 os.rmdir (path)
@@ -116,6 +116,10 @@ def get_commit (oid):
     message = '\n'.join (lines)
     return Commit (tree=tree, parent=parent, message=message)
 
+def checkout (oid):
+    commit = get_commit (oid)
+    read_tree (commit.tree)
+    data.set_HEAD (oid)
 
 def is_ignored(path: Path):
     return '.pika' in path.parts
