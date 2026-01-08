@@ -1,10 +1,13 @@
 import sys
 import textwrap
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
 from . import base, data
+
+OID = Annotated[str, typer.Argument(parser=base.get_oid)]
 
 app = typer.Typer()
 
@@ -24,7 +27,7 @@ def hash_object(file: str):
 
 
 @app.command()
-def cat_file(object: str):
+def cat_file(object: OID):
     """Print the contents of an object."""
     sys.stdout.flush()
     sys.stdout.buffer.write(data.get_object(object, expected=None))
@@ -37,7 +40,7 @@ def write_tree():
 
 
 @app.command()
-def read_tree(tree: str):
+def read_tree(tree: OID):
     """Read a tree object and restore files to the working directory."""
     print(base.read_tree(tree))
 
@@ -49,7 +52,7 @@ def commit(message: str = typer.Option(..., "--message", "-m")):
 
 
 @app.command()
-def log(oid: str | None = None):
+def log(oid: OID | None = None):
     """Show the commit log starting from the given commit or HEAD."""
     oid = oid or data.get_ref("HEAD")
     while oid:
@@ -63,7 +66,7 @@ def log(oid: str | None = None):
 
 
 @app.command()
-def checkout(oid: str):
+def checkout(oid: OID):
     """Checkout a commit and update the working directory."""
     base.checkout(oid)
 

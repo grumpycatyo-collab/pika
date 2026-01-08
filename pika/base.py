@@ -111,7 +111,7 @@ def get_commit(oid):
         elif key == "parent":
             parent = value
         else:
-            assert False, f"Unknown field {key}"
+            raise AssertionError(f"Unknown field {key}")
 
     message = "\n".join(lines)
     return Commit(tree=tree, parent=parent, message=message)
@@ -125,6 +125,10 @@ def checkout(oid):
 
 def create_tag(name, oid):
     data.update_ref(f"refs/tags/{name}", oid)
+
+
+def get_oid(name):
+    return data.get_ref(name) or name
 
 
 def is_ignored(path: Path):
