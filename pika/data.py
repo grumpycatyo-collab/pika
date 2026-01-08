@@ -15,3 +15,7 @@ def hash_object(data):
     with open(OBJECTS_DIR / oid, 'wb') as out:
         out.write(data)
     return oid
+
+def get_object(oid):
+    with open (OBJECTS_DIR / oid, 'rb') as f:
+        return f.read ()
