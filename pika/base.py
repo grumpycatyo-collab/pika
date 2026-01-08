@@ -1,10 +1,10 @@
 import itertools
 import operator
 import os
-from collections import namedtuple
 from pathlib import Path
 
 from . import data
+from .models import Commit
 
 
 def write_tree(directory="."):
@@ -97,9 +97,6 @@ def commit(message):
     data.set_HEAD(oid)
 
     return oid
-
-
-Commit = namedtuple("Commit", ["tree", "parent", "message"])
 
 
 def get_commit(oid):
