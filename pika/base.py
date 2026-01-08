@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 from . import data
 
-
 def write_tree(directory='.'):
     entries = []
     with os.scandir(directory) as it:
@@ -76,6 +75,11 @@ def read_tree(tree_oid):
 
 def commit (message):
     commit = f'tree {write_tree ()}\n'
+    
+    HEAD = data.get_HEAD()
+    if HEAD:
+        commit += f'parent {HEAD}\n'
+
     commit += '\n'
     commit += f'{message}\n'
 

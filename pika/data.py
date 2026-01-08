@@ -11,8 +11,13 @@ def init():
     os.makedirs(OBJECTS_DIR)
 
 def set_HEAD(oid):
-    with open(f'{GIT_DIR}/HEAD', 'w') as f:
+    with open(HEAD_DIR, 'w') as f:
         f.write(oid)
+
+def get_HEAD():
+    if os.path.isfile (HEAD_DIR):
+        with open(HEAD_DIR) as f:
+            return f.read().strip ()
 
 def hash_object(data, type_='blob'):
     obj = type_.encode() + b'\x00' + data # \x00 - object header separator
