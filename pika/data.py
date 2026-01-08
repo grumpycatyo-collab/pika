@@ -4,11 +4,15 @@ from pathlib import Path
 
 GIT_DIR = Path(".pika")
 OBJECTS_DIR = GIT_DIR / "objects"
+HEAD_DIR = GIT_DIR / "HEAD"
 
 def init():
     os.makedirs(GIT_DIR)
     os.makedirs(OBJECTS_DIR)
 
+def set_HEAD(oid):
+    with open(f'{GIT_DIR}/HEAD', 'w') as f:
+        f.write(oid)
 
 def hash_object(data, type_='blob'):
     obj = type_.encode() + b'\x00' + data # \x00 - object header separator
