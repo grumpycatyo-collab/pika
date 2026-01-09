@@ -1,13 +1,10 @@
 import sys
 import textwrap
 from pathlib import Path
-from typing import Annotated
 
 import typer
 
 from . import base, data
-
-OID = Annotated[str, typer.Argument(parser=base.get_oid)]
 
 app = typer.Typer()
 
@@ -27,8 +24,9 @@ def hash_object(file: str):
 
 
 @app.command()
-def cat_file(object: OID):
+def cat_file(object: str | None = None):
     """Print the contents of an object."""
+    object = base.get_oid(object or '@')
     sys.stdout.flush()
     sys.stdout.buffer.write(data.get_object(object, expected=None))
 
@@ -40,8 +38,9 @@ def write_tree():
 
 
 @app.command()
-def read_tree(tree: OID):
+def read_tree(tree: str | None = None):
     """Read a tree object and restore files to the working directory."""
+    tree = base.get_oid(tree or '@')
     print(base.read_tree(tree))
 
 
@@ -52,9 +51,9 @@ def commit(message: str = typer.Option(..., "--message", "-m")):
 
 
 @app.command()
-def log(oid: OID | None = None):
+def log(oid: str | None = None):
     """Show the commit log starting from the given commit or HEAD."""
-    oid = oid or data.get_ref("HEAD")
+    oid = base.get_oid(oid or '@')
     while oid:
         commit = base.get_commit(oid)
 
@@ -66,15 +65,16 @@ def log(oid: OID | None = None):
 
 
 @app.command()
-def checkout(oid: OID):
+def checkout(oid: str | None = None):
     """Checkout a commit and update the working directory."""
+    oid = base.get_oid(oid or '@')
     base.checkout(oid)
 
 
 @app.command()
 def tag(name: str, oid: str | None = None):
     """Tag a specific commit."""
-    oid = oid or data.get_ref("HEAD")
+    oid = base.get_oid(oid or '@')
     base.create_tag(name, oid)
 
 
