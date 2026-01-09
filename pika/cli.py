@@ -95,11 +95,13 @@ def k():
     dot += "}"
     print(dot)
 
+
 @app.command()
 def branch(name: str, start_point: str | None = None):
     start_point = base.get_oid(start_point or "@")
     base.create_branch(name, start_point)
-    print (f'Branch {name} created at {start_point[:10]}')
+    print(f"Branch {name} created at {start_point[:10]}")
+
 
 def main():
     app()
