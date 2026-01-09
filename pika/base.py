@@ -128,10 +128,26 @@ def create_tag(name, oid):
     data.update_ref(f"refs/tags/{name}", oid)
 
 
+def iter_commits_and_parents(oids):
+    oids = set(oids)
+    visited = set()
+
+    while oids:
+        oid = oids.pop()
+        if not oid or oid in visited:
+            continue
+        visited.add(oid)
+        yield oid
+
+        commit = get_commit(oid)
+        oids.add(commit.parent)
+
+
 def get_oid(name):
     # Name is ref
-    if name == '@': name = 'HEAD'
-    
+    if name == "@":
+        name = "HEAD"
+
     refs_to_try = [
         f"{name}",
         f"refs/{name}",
@@ -148,7 +164,7 @@ def get_oid(name):
         return name
 
     return None
-    
-    
+
+
 def is_ignored(path: Path):
     return ".pika" in path.parts
