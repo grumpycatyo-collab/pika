@@ -6,7 +6,7 @@ from collections import deque
 from pathlib import Path
 
 from . import data
-from .models import Commit
+from .models import Commit, RefValue
 
 
 def write_tree(directory="."):
@@ -88,7 +88,7 @@ def read_tree(tree_oid):
 def commit(message):
     commit = f"tree {write_tree()}\n"
 
-    HEAD = data.get_ref("HEAD")
+    HEAD = data.get_ref("HEAD").value
     if HEAD:
         commit += f"parent {HEAD}\n"
 
@@ -96,7 +96,7 @@ def commit(message):
     commit += f"{message}\n"
 
     oid = data.hash_object(commit.encode(), "commit")
-    data.update_ref("HEAD", oid)
+    data.update_ref('HEAD', RefValue(symbolic=False, value=oid))
 
     return oid
 
@@ -122,15 +122,15 @@ def get_commit(oid):
 def checkout(oid):
     commit = get_commit(oid)
     read_tree(commit.tree)
-    data.update_ref("HEAD", oid)
+    data.update_ref('HEAD', RefValue(symbolic=False, value=oid))
 
 
 def create_tag(name, oid):
-    data.update_ref(f"refs/tags/{name}", oid)
+    data.update_ref(f'refs/tags/{name}', RefValue(symbolic=False, value=oid))
 
 
 def create_branch(name, oid):
-    data.update_ref(f"refs/heads/{name}", oid)
+    data.update_ref(f'refs/heads/{name}', RefValue(symbolic=False, value=oid))
 
 
 def iter_commit_history(oids):
@@ -160,7 +160,7 @@ def get_oid(name):
         f"refs/heads/{name}",
     ]
     for ref in refs_to_try:
-        oid = data.get_ref(ref)
+        oid = data.get_ref(ref).value
         if oid:
             return oid
 

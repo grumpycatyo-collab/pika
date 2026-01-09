@@ -1,7 +1,7 @@
 import hashlib
 import os
 from pathlib import Path
-
+from .models import RefValue
 GIT_DIR = Path(".pika")
 OBJECTS_DIR = GIT_DIR / "objects"
 
@@ -11,14 +11,16 @@ def init():
     os.makedirs(OBJECTS_DIR)
 
 
-def update_ref(ref, oid):
+def update_ref(ref: str, rvalue: RefValue):
+    if rvalue.symbolic:
+        raise ValueError(f"Expected symbolic = False, got {rvalue.symbolic}")
     ref_path = GIT_DIR / ref
     os.makedirs(os.path.dirname(ref_path), exist_ok=True)
     with open(ref_path, "w") as f:
-        f.write(oid)
+        f.write(rvalue.value)
 
 
-def get_ref(ref):
+def get_ref(ref) -> RefValue:
     ref_path = GIT_DIR / ref
     value = None
     if os.path.isfile(ref_path):
@@ -28,7 +30,7 @@ def get_ref(ref):
     if value and value.startswith("ref:"):
         return get_ref(value.split(":", 1)[1].strip())
 
-    return value
+    return RefValue(symbolic = False, value = value)
 
 
 def iter_refs():
