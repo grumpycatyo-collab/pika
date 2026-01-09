@@ -53,15 +53,12 @@ def commit(message: str = typer.Option(..., "--message", "-m")):
 @app.command()
 def log(oid: str | None = None):
     """Show the commit log starting from the given commit or HEAD."""
-    oid = base.get_oid(oid or "@")
-    while oid:
+    for oid in base.iter_commit_history({base.get_oid(oid or "@")}):
         commit = base.get_commit(oid)
 
         print(f"commit {oid}\n")
         print(textwrap.indent(commit.message, "    "))
         print("")
-
-        oid = commit.parent
 
 
 @app.command()
@@ -80,6 +77,7 @@ def tag(name: str, oid: str | None = None):
 
 @app.command()
 def k():
+    """Show the commit graph"""
     dot = "digraph commits {\n"
 
     oids = set()
